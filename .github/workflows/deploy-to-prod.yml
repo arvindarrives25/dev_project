@@ -20,7 +20,7 @@ jobs:
         with:
           ref: prod
 
-      # Step 2: Set up Git identity
+      # Step 2: Configure Git User
       - name: Configure Git User
         run: |
           git config user.name "GitHub Actions"
@@ -37,22 +37,13 @@ jobs:
           git checkout prod
           git merge main --allow-unrelated-histories -m "Manual deployment from main to prod"
 
-      # Step 5: Direct Push to prod with inline URL
-      - name: Push to prod branch directly
+      # Step 5: Add remote with URL and Personal Access Token (PAT)
+      - name: Add remote with PAT
         run: |
-          git push https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/arvindarrives25/dev_project.git prod
+          git remote remove origin || true  # Ensure no existing origin remote causes conflict
+          git remote add origin https://arvindarrives25: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@github.com/arvindarrives25/dev_project.git
 
-      # Step 6: Deploy to Azure Databricks
-      - name: Install Databricks CLI
-        run: pip install databricks-cli
-
-      - name: Configure Databricks CLI
-        env:
-          DATABRICKS_HOST: "https://adb-3549450377455778.18.azuredatabricks.net"
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+      # Step 6: Push to prod branch using explicit remote and branch
+      - name: Push to prod branch
         run: |
-          databricks configure --token <<< "${DATABRICKS_TOKEN}"
-
-      - name: Upload Notebooks to Databricks
-        run: |
-          databricks workspace import_dir . "/Workspace/Repos/monika_kumar5@outlook.com/prod_project" --overwrite
+          git push origin prod
