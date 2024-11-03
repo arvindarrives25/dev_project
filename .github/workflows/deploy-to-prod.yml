@@ -1,4 +1,4 @@
-name: Deploy to Prod and Push to Databricks
+name: Deploy to Prod
 
 on:
   workflow_dispatch:
@@ -10,40 +10,29 @@ on:
 
 jobs:
   deploy:
-    if: ${{ github.ref == 'refs/heads/prod' && github.event.inputs.confirmation == 'yes' }}
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout prod branch
       - name: Checkout prod branch
         uses: actions/checkout@v3
         with:
           ref: prod
 
-      # Step 2: Configure Git User
-      - name: Configure Git User
+      - name: Set up Git user
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
-      # Step 3: Fetch all branches to ensure they are available
-      - name: Fetch all branches
-        run: git fetch --all
-
-      # Step 4: Check out main branch and merge into prod
-      - name: Check out and merge main into prod
+      - name: Merge main into prod
         run: |
-          git checkout main
+          git fetch origin main
           git checkout prod
-          git merge main --allow-unrelated-histories -m "Manual deployment from main to prod"
+          git merge origin/main -m "Manual deployment from main to prod"
 
-      # Step 5: Remove any existing origin and re-add with PAT
-      - name: Add remote with PAT
+      - name: Push to prod using PAT
+        env:
+          TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
           git remote remove origin || true
-          git remote add origin https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/arvindarrives25/dev_project.git
-
-      # Step 6: Push to prod branch using explicit remote and branch
-      - name: Push to prod branch
-        run: |
+          git remote add origin https://x-access-token:${TOKEN}@github.com/arvindarrives25/dev_project.git
           git push origin prod
