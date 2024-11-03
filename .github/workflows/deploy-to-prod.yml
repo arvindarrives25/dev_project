@@ -37,17 +37,21 @@ jobs:
           git checkout prod
           git merge main --allow-unrelated-histories -m "Manual deployment from main to prod"
 
-      # Step 5: Add remote with PAT
+      # Step 5: Define the remote URL in an environment variable
+      - name: Define Git Remote URL
+        run: echo "REMOTE_URL=https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/arvindarrives25/dev_project.git" >> $GITHUB_ENV
+
+      # Step 6: Add remote using the environment variable
       - name: Add origin remote with PAT
         run: |
-          git remote add origin https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/arvindarrives25/dev_project.git
+          git remote add origin $REMOTE_URL
 
-      # Step 6: Push to prod branch on origin
+      # Step 7: Push to prod branch on origin
       - name: Push to prod branch
         run: |
           git push origin prod
 
-      # Step 7: Deploy to Azure Databricks
+      # Step 8: Deploy to Azure Databricks
       - name: Install Databricks CLI
         run: pip install databricks-cli
 
