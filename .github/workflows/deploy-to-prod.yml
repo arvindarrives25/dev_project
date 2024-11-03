@@ -45,25 +45,19 @@ jobs:
         run: |
           git push origin prod
           
-      - name: Install Databricks CLI
-        run: pip install databricks-cli
-
-      - name: Configure Databricks CLI
+     # Step 6: Trigger Databricks Repo Pull
+      - name: Pull latest changes in Databricks
         env:
-          DATABRICKS_HOST: "https://adb-3549450377455778.18.azuredatabricks.net"  # Replace with your Databricks URL
+          DATABRICKS_HOST: "https://adb-3549450377455778.18.azuredatabricks.net"  # Replace with your Databricks instance URL
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
-          echo -e "${DATABRICKS_HOST}\n${DATABRICKS_TOKEN}" | databricks configure --token
+          REPO_ID=$(curl -X GET -H "Authorization: Bearer $DATABRICKS_TOKEN" \
+          "$DATABRICKS_HOST/api/2.0/repos" | jq -r '.repos[] | select(.path == "/Workspace/Repos/monika_kumar5@outlook.com/prod_project") | .id')
 
-      # New Step: Verify the Notebooks Directory Exists
-      - name: Verify Notebooks Directory
-        run: |
-          if [ ! -d "./notebooks" ]; then
-            echo "Directory ./notebooks does not exist. Check repository structure."
+          if [ -n "$REPO_ID" ]; then
+            curl -X POST -H "Authorization: Bearer $DATABRICKS_TOKEN" \
+            "$DATABRICKS_HOST/api/2.0/repos/$REPO_ID/update?branch=prod"
+          else
+            echo "Error: Repository not found in Databricks at the specified path."
             exit 1
           fi
-
-      # Deploy to the specific Databricks path /Workspace/Repos/monika_kumar5@outlook.com/prod_project
-      - name: Deploy Notebooks to Databricks
-        run: |
-          databricks workspace import_dir ./notebooks /Workspace/Repos/monika_kumar5@outlook.com/prod_project --overwrite
