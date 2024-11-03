@@ -37,17 +37,12 @@ jobs:
           git checkout prod
           git merge main --allow-unrelated-histories -m "Manual deployment from main to prod"
 
-      # Step 5: Debug - Print Remote URL
-      - name: Debug - Print Remote URL
-        run: |
-          echo "Remote URL: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/arvindarrives25/dev_project.git"
-
-      # Step 6: Push to prod branch with inline URL
-      - name: Push to prod branch with inline URL
+      # Step 5: Direct Push to prod with inline URL
+      - name: Push to prod branch directly
         run: |
           git push https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/arvindarrives25/dev_project.git prod
 
-      # Step 7: Deploy to Azure Databricks
+      # Step 6: Deploy to Azure Databricks
       - name: Install Databricks CLI
         run: pip install databricks-cli
 
