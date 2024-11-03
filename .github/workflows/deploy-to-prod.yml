@@ -14,22 +14,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3  # Updated to v3
-
-      - name: Set up Git
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
+      - name: Checkout prod branch
+        uses: actions/checkout@v3
+        with:
+          ref: prod  # Check out the prod branch
 
       - name: Fetch all branches
-        run: git fetch origin
+        run: git fetch --all
 
-      - name: Check out prod branch
-        run: git checkout prod
+      - name: Check out main branch
+        run: git checkout main  # Check out the main branch
 
-      - name: Merge dev into prod
-        run: git merge origin/dev -m "Manual deployment from dev to prod"
+      - name: Merge main into prod
+        run: |
+          git checkout prod
+          git merge main -m "Manual deployment from main to prod"  # Merge main into prod
 
       - name: Push to prod branch
         run: git push origin prod
@@ -40,7 +39,7 @@ jobs:
 
       - name: Configure Databricks CLI
         env:
-          DATABRICKS_HOST: "https://<your-databricks-instance>.azuredatabricks.net"  # Update with your Databricks URL
+          DATABRICKS_HOST: "https://adb-3549450377455778.18.azuredatabricks.net"  # Replace with your Databricks URL
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
           databricks configure --token <<< "${DATABRICKS_HOST}\n${DATABRICKS_TOKEN}"
