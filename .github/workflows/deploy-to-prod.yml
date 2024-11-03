@@ -45,18 +45,30 @@ jobs:
         run: |
           git push origin prod
           
-     # Step 6: Trigger Databricks Repo Pull
-      - name: Pull latest changes in Databricks
+     # Step 6: List All Databricks Repos (Diagnostic Step)
+      - name: List All Databricks Repos
         env:
-          DATABRICKS_HOST: "https://adb-3549450377455778.18.azuredatabricks.net"  # Replace with your Databricks instance URL
+          DATABRICKS_HOST: "https://<your-databricks-instance>.azuredatabricks.net"  # Replace with your Databricks instance URL
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
+          echo "Listing all repos in Databricks to confirm path:"
+          curl -X GET -H "Authorization: Bearer $DATABRICKS_TOKEN" "$DATABRICKS_HOST/api/2.0/repos" | jq '.repos[] | .path'
+
+      # Step 7: Pull latest changes in Databricks
+      - name: Pull latest changes in Databricks
+        env:
+          DATABRICKS_HOST: "https://<your-databricks-instance>.azuredatabricks.net"
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: |
+          REPO_PATH="/Workspace/Repos/monika_kumar5@outlook.com/prod_project"  # Confirm this matches exactly
           REPO_ID=$(curl -X GET -H "Authorization: Bearer $DATABRICKS_TOKEN" \
-          "$DATABRICKS_HOST/api/2.0/repos" | jq -r '.repos[] | select(.path == "/Workspace/Repos/monika_kumar5@outlook.com/prod_project") | .id')
+          "$DATABRICKS_HOST/api/2.0/repos" | jq -r --arg path "$REPO_PATH" '.repos[] | select(.path == $path) | .id')
 
           if [ -n "$REPO_ID" ]; then
+            echo "Found repository with ID $REPO_ID. Pulling latest changes..."
             curl -X POST -H "Authorization: Bearer $DATABRICKS_TOKEN" \
             "$DATABRICKS_HOST/api/2.0/repos/$REPO_ID/update?branch=prod"
+            echo "Successfully pulled latest changes in Databricks."
           else
             echo "Error: Repository not found in Databricks at the specified path."
             exit 1
