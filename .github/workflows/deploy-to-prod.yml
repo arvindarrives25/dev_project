@@ -37,10 +37,10 @@ jobs:
           git checkout prod
           git merge main --allow-unrelated-histories -m "Manual deployment from main to prod"
 
-      # Step 5: Direct Push to prod with inline URL
+      # Step 5: Push to prod branch directly with hardcoded URL
       - name: Push to prod branch directly
         run: |
-          git push https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/arvindarrives25/dev_project.git prod
+          git push https://arvindarrives25@gmail.com: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@github.com/arvindarrives25/dev_project.git prod
 
       # Step 6: Deploy to Azure Databricks
       - name: Install Databricks CLI
@@ -49,9 +49,9 @@ jobs:
       - name: Configure Databricks CLI
         env:
           DATABRICKS_HOST: "https://adb-3549450377455778.18.azuredatabricks.net"
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_TOKEN: "dapiad618e4a5100aed923b44c6dd91661d7"
         run: |
-          databricks configure --token <<< "${DATABRICKS_TOKEN}"
+          databricks configure --token <<< "dapiad618e4a5100aed923b44c6dd91661d7"
 
       - name: Upload Notebooks to Databricks
         run: |
