@@ -37,7 +37,7 @@ jobs:
 
       - name: Push to prod branch
         run: |
-          git push https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/arvindarrives25/dev_project.git prod
+          git push https://${{secrets.PERSONAL_ACCESS_TOKEN}}@github.com/arvindarrives25/dev_project.git prod
 
       # Deploy to Azure Databricks using Databricks CLI
       - name: Install Databricks CLI
