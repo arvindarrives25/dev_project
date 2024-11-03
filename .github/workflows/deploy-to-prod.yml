@@ -46,7 +46,7 @@ jobs:
       - name: Configure Databricks CLI
         env:
           DATABRICKS_HOST: "https://adb-3549450377455778.18.azuredatabricks.net"  # Replace with your Databricks URL
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_TOKEN: ${{secrets.DATABRICKS_TOKEN}}
         run: |
           databricks configure --token <<< "${DATABRICKS_HOST}\n${DATABRICKS_TOKEN}"
 
