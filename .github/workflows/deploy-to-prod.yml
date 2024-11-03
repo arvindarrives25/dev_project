@@ -28,7 +28,7 @@ jobs:
         run: git fetch --all
 
       - name: Check out main branch
-        run: git checkout main  # Check out the main branch
+        run: git checkout main  # Check out the main branch as dev
 
       - name: Merge main into prod
         run: |
