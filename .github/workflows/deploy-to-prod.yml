@@ -14,41 +14,46 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout prod branch
       - name: Checkout prod branch
         uses: actions/checkout@v3
         with:
-          ref: prod  # Check out the prod branch
+          ref: prod
 
+      # Step 2: Set up Git identity
       - name: Configure Git User
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
+      # Step 3: Fetch all branches to ensure they are available
       - name: Fetch all branches
         run: git fetch --all
 
-      - name: Check out main branch
-        run: git checkout main  # Check out the main branch
-
-      - name: Merge main into prod
+      # Step 4: Check out main branch and merge into prod
+      - name: Check out and merge main into prod
         run: |
+          git checkout main
           git checkout prod
           git merge main --allow-unrelated-histories -m "Manual deployment from main to prod"
 
-      # Push to prod branch
+      # Step 5: Add remote with PAT
+      - name: Add origin remote with PAT
+        run: |
+          git remote add origin https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/arvindarrives25/dev_project.git
+
+      # Step 6: Push to prod branch on origin
       - name: Push to prod branch
-        env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
           git push origin prod
 
-      # Deploy to Azure Databricks using Databricks CLI
+      # Step 7: Deploy to Azure Databricks
       - name: Install Databricks CLI
         run: pip install databricks-cli
 
       - name: Configure Databricks CLI
         env:
-          DATABRICKS_HOST: "https://adb-3549450377455778.18.azuredatabricks.net"  # Replace with your Databricks URL
+          DATABRICKS_HOST: "https://adb-3549450377455778.18.azuredatabricks.net"
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
           databricks configure --token <<< "${DATABRICKS_HOST}\n${DATABRICKS_TOKEN}"
