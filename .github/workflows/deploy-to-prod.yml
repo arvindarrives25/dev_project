@@ -1,4 +1,4 @@
-name: Deploy to Prod
+name: Deploy to Prod with SSH Key
 
 on:
   workflow_dispatch:
@@ -13,26 +13,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout prod branch using SSH
       - name: Checkout prod branch
         uses: actions/checkout@v3
         with:
-          ref: prod
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}  # Use SSH key instead of HTTPS
 
-      - name: Set up Git user
+      # Step 2: Set up SSH for Git
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      # Step 3: Configure Git user
+      - name: Configure Git User
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
+      # Step 4: Merge main into prod
       - name: Merge main into prod
         run: |
           git fetch origin main
           git checkout prod
-          git merge origin/main -m "Manual deployment from main to prod"
+          git merge origin/main --allow-unrelated-histories -m "Manual deployment from main to prod"
 
-      - name: Push to prod using PAT
-        env:
-          TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      # Step 5: Push changes to prod branch using SSH
+      - name: Push changes
         run: |
-          git remote remove origin || true
-          git remote add origin https://x-access-token:${TOKEN}@github.com/arvindarrives25/dev_project.git
           git push origin prod
