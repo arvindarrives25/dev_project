@@ -10,7 +10,6 @@ on:
 
 jobs:
   deploy:
-    # Conditional check to ensure the workflow only runs on the prod branch
     if: github.ref == 'refs/heads/prod' && github.event.inputs.confirmation == 'yes'
     runs-on: ubuntu-latest
 
