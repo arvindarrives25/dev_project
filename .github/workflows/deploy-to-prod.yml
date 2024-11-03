@@ -35,15 +35,12 @@ jobs:
           git checkout prod
           git merge main --allow-unrelated-histories -m "Manual deployment from main to prod"
 
-      - name: Add Remote with PAT
-        # Add a new remote that includes the PAT for authentication
-        run: |
-          git remote add github https://${{secrets.PERSONAL_ACCESS_TOKEN}}@github.com/arvindarrives25/dev_project.git
-
+      # Push to prod branch
       - name: Push to prod branch
-        # Push changes to prod branch using the configured remote
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
-          git push github prod
+          git push https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/arvindarrives25/dev_project.git prod
 
       # Deploy to Azure Databricks using Databricks CLI
       - name: Install Databricks CLI
@@ -52,7 +49,7 @@ jobs:
       - name: Configure Databricks CLI
         env:
           DATABRICKS_HOST: "https://adb-3549450377455778.18.azuredatabricks.net"  # Replace with your Databricks URL
-          DATABRICKS_TOKEN: ${{secrets.DATABRICKS_TOKEN}}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
           databricks configure --token <<< "${DATABRICKS_HOST}\n${DATABRICKS_TOKEN}"
 
