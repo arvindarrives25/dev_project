@@ -28,10 +28,11 @@ jobs:
       - name: Merge main into prod
         run: |
           git checkout prod
-          git merge main --allow-unrelated-histories -m "Manual deployment from main to prod"  # Merge main into prod with flag
+          git merge main --allow-unrelated-histories -m "Manual deployment from main to prod"
 
       - name: Push to prod branch
-        run: git push origin prod
+        run: |
+          git push https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/mygit/dev_project.git prod
 
       # Deploy to Azure Databricks using Databricks CLI
       - name: Install Databricks CLI
@@ -46,4 +47,4 @@ jobs:
 
       - name: Upload Notebooks to Databricks
         run: |
-          databricks workspace import_dir . /Repos/prod_project --overwrite
+          databricks workspace import_dir . "/Workspace/Repos/monika_kumar5@outlook.com/prod_project" --overwrite
