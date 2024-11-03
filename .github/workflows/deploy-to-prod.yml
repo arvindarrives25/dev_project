@@ -10,7 +10,7 @@ on:
 
 jobs:
   deploy:
-    if: github.ref == 'refs/heads/prod' && github.event.inputs.confirmation == 'yes'
+    if: ${{ github.ref == 'refs/heads/prod' && github.event.inputs.confirmation == 'yes' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -41,17 +41,22 @@ jobs:
       - name: Define Git Remote URL
         run: echo "REMOTE_URL=https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/arvindarrives25/dev_project.git" >> $GITHUB_ENV
 
-      # Step 6: Add remote using the environment variable
+      # Step 6: Diagnostic - Echo the URL to verify it’s correct
+      - name: Verify Remote URL
+        run: |
+          echo "Remote URL is: $REMOTE_URL"
+
+      # Step 7: Add remote using the environment variable
       - name: Add origin remote with PAT
         run: |
-          git remote add origin $REMOTE_URL
+          git remote add origin "$REMOTE_URL"
 
-      # Step 7: Push to prod branch on origin
+      # Step 8: Push to prod branch on origin
       - name: Push to prod branch
         run: |
           git push origin prod
 
-      # Step 8: Deploy to Azure Databricks
+      # Step 9: Deploy to Azure Databricks
       - name: Install Databricks CLI
         run: pip install databricks-cli
 
@@ -60,7 +65,7 @@ jobs:
           DATABRICKS_HOST: "https://adb-3549450377455778.18.azuredatabricks.net"
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
-          databricks configure --token <<< "${DATABRICKS_HOST}\n${DATABRICKS_TOKEN}"
+          databricks configure --token <<< "${DATABRICKS_TOKEN}"
 
       - name: Upload Notebooks to Databricks
         run: |
