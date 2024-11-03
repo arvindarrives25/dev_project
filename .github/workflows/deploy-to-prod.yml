@@ -44,3 +44,16 @@ jobs:
       - name: Push changes
         run: |
           git push origin prod
+      # Step 6: Configure Databricks CLI
+      - name: Configure Databricks CLI
+        env:
+          DATABRICKS_HOST: "https://adb-3549450377455778.18.azuredatabricks.net"  # Replace with your Databricks instance URL
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}  # Use the saved Databricks token
+        run: |
+          pip install databricks-cli
+          databricks configure --token <<< "${DATABRICKS_HOST}\n${DATABRICKS_TOKEN}"
+
+      # Step 7: Deploy Notebooks to Databricks
+      - name: Upload Notebooks to Databricks
+        run: |
+          databricks workspace import_dir ./notebooks /Workspace/Repos/monika_kumar5@outlook.com/dev_project --overwrite
