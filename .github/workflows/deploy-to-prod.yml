@@ -40,7 +40,7 @@ jobs:
       # Step 5: Add remote with PAT
       - name: Add origin remote with PAT
         run: |
-          git remote add origin https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/arvindarrives25/dev_project.git
+          git remote add origin https://${{secrets.PERSONAL_ACCESS_TOKEN}}@github.com/arvindarrives25/dev_project.git
 
       # Step 6: Push to prod branch on origin
       - name: Push to prod branch
