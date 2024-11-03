@@ -28,7 +28,7 @@ jobs:
         run: git fetch --all
 
       - name: Check out main branch
-        run: git checkout main  # Check out the main branch as dev
+        run: git checkout main  # Check out the main branch
 
       - name: Merge main into prod
         run: |
@@ -40,7 +40,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
-          git push https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/arvindarrives25/dev_project.git prod
+          git push origin prod
 
       # Deploy to Azure Databricks using Databricks CLI
       - name: Install Databricks CLI
