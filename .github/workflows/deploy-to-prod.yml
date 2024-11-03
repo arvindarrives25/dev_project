@@ -37,11 +37,11 @@ jobs:
           git checkout prod
           git merge main --allow-unrelated-histories -m "Manual deployment from main to prod"
 
-      # Step 5: Add remote with URL and Personal Access Token (PAT)
+      # Step 5: Add remote with Personal Access Token (PAT)
       - name: Add remote with PAT
         run: |
           git remote remove origin || true  # Ensure no existing origin remote causes conflict
-          git remote add origin https://arvindarrives25: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@github.com/arvindarrives25/dev_project.git
+          git remote add origin https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/arvindarrives25/dev_project.git
 
       # Step 6: Push to prod branch using explicit remote and branch
       - name: Push to prod branch
